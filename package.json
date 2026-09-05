@@ -1,15 +1,16 @@
 {
-  "name": "monid-prospect-brief",
-  "version": "0.1.0",
+  "name": "monid-verified-lead-brief",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "Hackathon MVP: replace one Apollo-style prospect research workflow with live Monid endpoints and transparent per-run cost.",
+  "description": "Monid We Kill entry: person + company to verified work email and firmographic brief with transparent cost.",
   "scripts": {
     "start": "node src/server.mjs",
     "test": "node --test",
     "monid:doctor": "node src/cli.mjs doctor",
     "monid:discover": "node src/cli.mjs discover",
-    "monid:inspect": "node src/cli.mjs inspect"
+    "monid:inspect": "node src/cli.mjs inspect",
+    "monid:preflight": "node src/cli.mjs preflight"
   },
   "engines": {"node": ">=22"}
 }

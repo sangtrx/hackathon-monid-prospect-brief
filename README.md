@@ -1,22 +1,39 @@
-# Prospect Brief — Monid “We Kill” MVP
+# Verified Lead Brief — Monid “We Kill”
 
-A narrow, judge-friendly replacement for one paid prospect/company research workflow: enter a company/person, run **inspected live Monid endpoints**, normalize the evidence, and show the exact run cost and latency next to the incumbent SaaS price.
+A narrow, live replacement for one Apollo prospect-research workflow:
 
-## Why this shape
+**person + company → work email → deliverability check → company firmographics → one costed brief**
 
-- No guessed Monid schemas. Endpoints live in `config/endpoints.local.json`, created only after `discover -> inspect`.
-- Cost is first-class. Every call records provider, endpoint, status, cost and latency.
-- Failures are visible. Bad input, no results, partial results and provider errors do not turn into fake facts.
-- The UI explicitly says what this replaces and what it does not.
+The demo does not claim to replace Apollo's CRM, sequencing, dialer, or full database. It kills one human-sold enrichment/research job that an agent can perform on demand.
+
+## Target price reference
+
+Apollo Organization is publicly listed at **$119/user/month billed annually with a 3-user minimum**, i.e. **$4,284/year minimum**. The app shows this only as the incumbent subscription reference; the actual Monid run cost is taken from each live run result.
+
+Price source: https://www.apollo.io/pricing
+
+## Live workflow
+
+1. `apollo /people/match` — match a known person at a company domain.
+2. Extract a returned work email; never invent one.
+3. `api.strale.io /x402/email-validate` — verify deliverability of the actual returned email.
+4. `pdl /v5/company/enrich` — company firmographics from the domain, with `min_likelihood: 4`.
+5. Return a single JSON/UI brief with evidence, provider status, latency and actual per-run cost.
+
+These endpoint/input shapes are documented by Monid, but **preflight inspection remains required before the paid demo** because schema, health and price can change.
 
 ## Setup
 
-1. Install the current Monid CLI: `npm install -g @monid-ai/cli@latest`
-2. Run `monid setup --client codex`.
-3. Add a key locally with `monid keys add -k <key> -l main` and verify with `monid keys list`.
-4. Discover candidates: `npm run monid:discover -- "company enrichment"` and `npm run monid:discover -- "linkedin person profile"`.
-5. Inspect exact candidates: `npm run monid:inspect -- <provider> <endpoint>`.
-6. Copy `config/endpoints.example.json` to `config/endpoints.local.json` and fill only the inspected provider/endpoint plus the exact input template required by that schema.
-7. `npm test && npm start`.
+```bash
+npm install -g @monid-ai/cli@latest
+monid setup --client codex
+monid keys add -k <your-key> -l main
+npm run monid:doctor
+npm run monid:preflight
+npm test
+npm start
+```
 
-The server intentionally refuses to call endpoints while the local config still contains placeholders.
+`npm run monid:preflight` performs free `inspect` calls for all three live endpoints. Review the current schemas/prices/health before clicking the paid demo.
+
+No outreach is sent by this project. A verified email is data quality evidence, not permission to spam.
