@@ -1,0 +1,30 @@
+{
+  "workflow": "prospect-brief",
+  "incumbent": {
+    "name": "Apollo Basic",
+    "publicPrice": "$49/user/month billed annually",
+    "priceSource": "https://www.apollo.io/pricing",
+    "claim": "This demo replaces one narrow research/enrichment workflow, not Apollo as a whole."
+  },
+  "steps": [
+    {
+      "id": "company",
+      "label": "Company evidence",
+      "provider": "REPLACE_AFTER_INSPECT",
+      "endpoint": "REPLACE_AFTER_INSPECT",
+      "inputLocation": "body",
+      "inputTemplate": {"REPLACE_AFTER_INSPECT": "{{company}}"},
+      "maxWaitSeconds": 30
+    },
+    {
+      "id": "person",
+      "label": "Person evidence",
+      "provider": "REPLACE_AFTER_INSPECT",
+      "endpoint": "REPLACE_AFTER_INSPECT",
+      "inputLocation": "body",
+      "inputTemplate": {"REPLACE_AFTER_INSPECT": "{{person}}"},
+      "maxWaitSeconds": 30,
+      "optional": true
+    }
+  ]
+}
