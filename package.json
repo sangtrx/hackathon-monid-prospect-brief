@@ -1,0 +1,15 @@
+{
+  "name": "monid-prospect-brief",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Hackathon MVP: replace one Apollo-style prospect research workflow with live Monid endpoints and transparent per-run cost.",
+  "scripts": {
+    "start": "node src/server.mjs",
+    "test": "node --test",
+    "monid:doctor": "node src/cli.mjs doctor",
+    "monid:discover": "node src/cli.mjs discover",
+    "monid:inspect": "node src/cli.mjs inspect"
+  },
+  "engines": {"node": ">=22"}
+}
