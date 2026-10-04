@@ -1,39 +1,125 @@
-# Verified Lead Brief — Monid “We Kill”
+# RxCheck Pocket
 
-A narrow, live replacement for one Apollo prospect-research workflow:
+**Offline-first medication-safety decision support for low-connectivity frontline settings.**
 
-**person + company → work email → deliverability check → company firmographics → one costed brief**
+RxCheck Pocket is a deliberately bounded entry for Hack-Nation 7, World Bank Small AI for Development, Health track. It checks a short medication list against a compact local rule set, prioritizes high-risk findings, keeps every curated interaction traceable to a public source, and fails closed when a medicine name is not confirmed.
 
-The demo does not claim to replace Apollo's CRM, sequencing, dialer, or full database. It kills one human-sold enrichment/research job that an agent can perform on demand.
+The core path runs entirely in the browser after the first load. No API key, backend, LLM, patient record or continuous internet connection is required.
 
-## Target price reference
+## Why this fits Small AI
 
-Apollo Organization is publicly listed at **$119/user/month billed annually with a 3-user minimum**, i.e. **$4,284/year minimum**. The app shows this only as the incumbent subscription reference; the actual Monid run cost is taken from each live run result.
+This project does not try to be a general medical chatbot. It trades breadth for a narrow, auditable workflow that remains available on ordinary devices when connectivity is unreliable.
 
-Price source: https://www.apollo.io/pricing
+- **Targeted task:** medication-list risk screening and reconciliation prompts.
+- **Accessible runtime:** static PWA, installable from a browser.
+- **Offline path:** rules, aliases and UI are cached locally.
+- **Fail-closed behavior:** unknown names are never silently corrected.
+- **Human authority:** the app flags risk; a clinician or pharmacist decides what to do.
+- **Data minimization:** no patient data is required or stored by the demo.
 
-## Live workflow
+## What it checks
 
-1. `apollo /people/match` — match a known person at a company domain.
-2. Extract a returned work email; never invent one.
-3. `api.strale.io /x402/email-validate` — verify deliverability of the actual returned email.
-4. `pdl /v5/company/enrich` — company firmographics from the domain, with `min_likelihood: 4`.
-5. Return a single JSON/UI brief with evidence, provider status, latency and actual per-run cost.
+The bundled demo covers a small set of label-supported interaction patterns:
 
-These endpoint/input shapes are documented by Monid, but **preflight inspection remains required before the paid demo** because schema, health and price can change.
+- sildenafil plus organic nitrates
+- clarithromycin plus simvastatin or lovastatin
+- clarithromycin plus warfarin
+- sertraline plus warfarin, aspirin, ibuprofen or naproxen
+- sertraline plus pimozide
+- sertraline plus an MAOI example, phenelzine
+- duplicate active ingredient after brand/generic alias resolution
+- NSAID or statin therapeutic-class duplication as a reconciliation prompt
 
-## Setup
+This is intentionally **not** a complete drug-interaction database.
 
-```bash
-npm install -g @monid-ai/cli@latest
-monid setup --client codex
-monid keys add -k <your-key> -l main
-npm run monid:doctor
-npm run monid:preflight
-npm test
-npm start
-```
+## Safety boundary
 
-`npm run monid:preflight` performs free `inspect` calls for all three live endpoints. Review the current schemas/prices/health before clicking the paid demo.
+RxCheck Pocket is a hackathon prototype for decision support. It does not diagnose, prescribe, recommend doses, recommend treatment changes, or claim that a pair is safe when no rule is found.
 
-No outreach is sent by this project. A verified email is data quality evidence, not permission to spam.
+A **REVIEW** result that says “No curated rule matched” means only that the bounded demo dataset has no matching rule. It must not be interpreted as clinical clearance.
+
+Archived FDA labels are used as public provenance for several demo rules. Production use would require validated, current labeling and a governed clinical knowledge process.
+
+## Public-source provenance
+
+| Rule family | Public source |
+| --- | --- |
+| Sildenafil + nitrates | [FDA VIAGRA label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2015/020895s045lbl.pdf) |
+| Clarithromycin + warfarin/statins | [FDA BIAXIN label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2013/050698s031lbl.pdf) |
+| Sertraline contraindications and bleeding risk | [FDA ZOLOFT label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2016/019839S74S86S87_20990S35S44S45lbl.pdf) |
+| NSAID class reconciliation | [FDA NSAID safety information](https://www.fda.gov/drugs/drug-safety-and-availability/fda-recommends-avoiding-use-nsaids-pregnancy-20-weeks-or-later-because-they-can-result-low-amniotic) |
+| Statin class reconciliation | [FDA Cholesterol Medicines Guide](https://www.fda.gov/consumers/womens-health-topics/cholesterol-medicines-guide) |
+
+Retrieval/review date for this hackathon prototype: **2026-10-04**.
+
+## Architecture
+
+    medication names
+          |
+          v
+    local normalization + explicit alias map
+          |
+          +--> unknown/typo -> UNKNOWN + confirmation prompt
+          |
+          v
+    deterministic pair rules + class reconciliation
+          |
+          v
+    severity ordering: RED > AMBER > REVIEW > UNKNOWN
+          |
+          v
+    short explanation + action + source provenance
+
+The service worker caches the UI plus the rule engine. After the first successful load, the core checker does not require the network.
+
+## Run locally
+
+Requires Node.js 22 or newer.
+
+    npm test
+    npm run evaluate
+    npm run build
+    npm start
+
+Open http://127.0.0.1:4173.
+
+## Evaluation
+
+npm run evaluate runs a fixed set of synthetic/publicly-derived regression fixtures and a local micro-benchmark. The evaluation checks deterministic agreement with the expected behavior of this bundled rule set only.
+
+**Do not interpret fixture agreement as clinical sensitivity, specificity, safety validation or real-world performance.**
+
+## Deploy
+
+The repository includes vercel.json. Run npm run build and deploy the generated dist directory using Vercel or any static HTTPS host.
+
+HTTPS is required for normal service-worker behavior outside localhost.
+
+## Demo cases
+
+- sildenafil, nitroglycerin
+- clarithromycin, warfarin
+- sertraline, ibuprofen
+- ibuprofen, naproxen
+- warfarin, Coumadin
+- sildnafil, nitroglycerin
+- sildenafil, warfarin
+- sertraline, pimozide
+
+## Limitations
+
+- Tiny curated scope built for a 24-hour challenge.
+- No dose, route, timing, age, pregnancy, organ function, indication or laboratory context.
+- No full interaction ontology.
+- No current-label synchronization.
+- Typo suggestions are string-distance hints only and require explicit human confirmation.
+- Browser offline cache must be installed by one successful initial load.
+- Clinical deployment would require current governed data, formal validation, security/privacy review, quality management and local regulatory assessment.
+
+## Submission assets
+
+See [docs/SUBMISSION.md](docs/SUBMISSION.md).
+
+## License
+
+MIT for the software. Linked FDA source material remains subject to its source terms.
