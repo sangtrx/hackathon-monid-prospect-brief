@@ -1,16 +1,14 @@
 {
-  "name": "monid-verified-lead-brief",
-  "version": "0.2.0",
+  "name": "rxcheck-pocket",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Monid We Kill entry: person + company to verified work email and firmographic brief with transparent cost.",
+  "description": "Offline-first medication safety decision support for low-connectivity frontline settings.",
   "scripts": {
-    "start": "node src/server.mjs",
-    "test": "node --test",
-    "monid:doctor": "node src/cli.mjs doctor",
-    "monid:discover": "node src/cli.mjs discover",
-    "monid:inspect": "node src/cli.mjs inspect",
-    "monid:preflight": "node src/cli.mjs preflight"
+    "build": "node scripts/build.mjs",
+    "start": "node scripts/serve.mjs",
+    "test": "node --test && node scripts/evaluate.mjs && node scripts/build.mjs",
+    "evaluate": "node scripts/evaluate.mjs"
   },
-  "engines": {"node": ">=22"}
+  "engines": { "node": ">=22" }
 }
